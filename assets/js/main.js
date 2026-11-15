@@ -583,8 +583,8 @@
   "use strict";
 
   var SITE_URL = "https://www.alaminebfsservices.com/";
-  var SHARE_TITLE = "Al Amine BFS Services Voyages";
-  var SHARE_TEXT = "Al Amine BFS Services Voyages — Oumra, Hajj, billets et visas depuis Dakar.";
+  var SHARE_TITLE = "AL AMINE BFS VOYAGES";
+  var SHARE_TEXT = "AL AMINE BFS VOYAGES — Oumra, Hajj, billets et visas depuis Dakar.";
 
   /* ---------- Service worker ---------- */
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
