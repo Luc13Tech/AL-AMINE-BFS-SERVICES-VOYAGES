@@ -1,6 +1,6 @@
 /* Service worker — Al Amine BFS Services Voyages
    Incrémenter CACHE_VERSION à chaque livraison pour forcer la mise à jour. */
-var CACHE_VERSION = "v1";
+var CACHE_VERSION = "v2";
 var CACHE_NAME = "al-amine-bfs-" + CACHE_VERSION;
 
 var PRECACHE = [
