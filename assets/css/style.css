@@ -3848,3 +3848,84 @@ button {
   }
 
   .offer-footer
+
+/* ---------- 26. Application (PWA) & partage — bloc Contact ---------- */
+.app-share {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.app-actions .btn[disabled] {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.share-fallback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.share-fallback[hidden],
+.app-help[hidden] {
+  display: none;
+}
+
+.contact-card .share-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: var(--emerald-900);
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.contact-card .share-link:hover {
+  border-color: var(--gold-500);
+  background: var(--gold-100);
+  color: var(--emerald-900);
+}
+
+.contact-card .app-help {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--cream);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.contact-card .app-status {
+  min-height: 1.2em;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold-700);
+}
+
+.contact-card .app-status:empty {
+  margin-top: 0;
+  min-height: 0;
+}
+
+@media (max-width: 420px) {
+  .app-actions .btn {
+    flex: 1 1 100%;
+  }
+}

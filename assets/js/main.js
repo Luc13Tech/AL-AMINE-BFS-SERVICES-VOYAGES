@@ -575,3 +575,142 @@
   var year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
 })();
+
+/* ==========================================================
+   Application PWA : service worker, installation et partage
+   ========================================================== */
+(function () {
+  "use strict";
+
+  var SITE_URL = "https://www.alaminebfsservices.com/";
+  var SHARE_TITLE = "Al Amine BFS Services Voyages";
+  var SHARE_TEXT = "Al Amine BFS Services Voyages — Oumra, Hajj, billets et visas depuis Dakar.";
+
+  /* ---------- Service worker ---------- */
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
+
+  /* ---------- Installation ---------- */
+  var deferredPrompt = null;
+  var installBtn = document.getElementById("pwa-install");
+  var installLabel = installBtn ? installBtn.querySelector(".pwa-install-label") : null;
+  var help = document.getElementById("pwa-help");
+  var status = document.getElementById("share-status");
+
+  var ua = navigator.userAgent || "";
+  var isIOS = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+
+  function showHelp(text) {
+    if (!help) return;
+    help.textContent = text;
+    help.hidden = false;
+  }
+
+  function setStatus(text) {
+    if (!status) return;
+    status.textContent = text;
+    clearTimeout(setStatus.timer);
+    setStatus.timer = setTimeout(function () { status.textContent = ""; }, 3500);
+  }
+
+  function markInstalled() {
+    if (!installBtn) return;
+    installBtn.disabled = true;
+    if (installLabel) installLabel.textContent = "Application installée";
+  }
+
+  if (isStandalone) markInstalled();
+
+  window.addEventListener("beforeinstallprompt", function (event) {
+    event.preventDefault();
+    deferredPrompt = event;
+  });
+
+  window.addEventListener("appinstalled", function () {
+    deferredPrompt = null;
+    markInstalled();
+    if (help) help.hidden = true;
+    setStatus("Application installée. Merci !");
+  });
+
+  if (installBtn) {
+    installBtn.addEventListener("click", function () {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function (choice) {
+          if (choice && choice.outcome === "accepted") markInstalled();
+          deferredPrompt = null;
+        }).catch(function () {});
+        return;
+      }
+      if (isIOS) {
+        showHelp("Sur iPhone ou iPad : ouvrez ce site dans Safari, touchez le bouton Partager (le carré avec une flèche), puis « Sur l'écran d'accueil ».");
+      } else {
+        showHelp("Ouvrez le menu de votre navigateur (⋮ ou ⋯), puis choisissez « Installer l'application » ou « Ajouter à l'écran d'accueil ». Sur ordinateur, vous pouvez aussi cliquer sur l'icône d'installation dans la barre d'adresse.");
+      }
+    });
+  }
+
+  /* ---------- Copier le lien ---------- */
+  function fallbackCopy(text) {
+    var field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.appendChild(field);
+    field.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(field);
+    return ok;
+  }
+
+  var copyBtn = document.getElementById("share-copy");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function () {
+      var done = function () { setStatus("Lien copié : " + SITE_URL); };
+      var fail = function () { setStatus("Copiez ce lien : " + SITE_URL); };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(SITE_URL).then(done, function () {
+          fallbackCopy(SITE_URL) ? done() : fail();
+        });
+      } else {
+        fallbackCopy(SITE_URL) ? done() : fail();
+      }
+    });
+  }
+
+  /* ---------- Partager ---------- */
+  var shareBtn = document.getElementById("share-native");
+  var panel = document.getElementById("share-fallback");
+  var wa = document.getElementById("share-whatsapp");
+  var fb = document.getElementById("share-facebook");
+  var mail = document.getElementById("share-email");
+
+  if (wa) wa.href = "https://wa.me/?text=" + encodeURIComponent(SHARE_TEXT + " " + SITE_URL);
+  if (fb) fb.href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(SITE_URL);
+  if (mail) mail.href = "mailto:?subject=" + encodeURIComponent(SHARE_TITLE) + "&body=" + encodeURIComponent(SHARE_TEXT + "\n" + SITE_URL);
+
+  function togglePanel() {
+    if (!panel || !shareBtn) return;
+    panel.hidden = !panel.hidden;
+    shareBtn.setAttribute("aria-expanded", panel.hidden ? "false" : "true");
+  }
+
+  if (shareBtn) {
+    shareBtn.addEventListener("click", function () {
+      if (navigator.share) {
+        navigator.share({ title: SHARE_TITLE, text: SHARE_TEXT, url: SITE_URL }).catch(function (err) {
+          if (err && err.name !== "AbortError") togglePanel();
+        });
+      } else {
+        togglePanel();
+      }
+    });
+  }
+})();
